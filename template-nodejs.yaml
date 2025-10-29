@@ -1,0 +1,63 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: nodejs-hello-world-template
+  title: Node.js Hello World Service
+  description: |
+    Scaffold a simple Node.js Express app and register it in the Developer Hub catalog.
+  tags:
+    - nodejs
+    - express
+    - sample
+spec:
+  owner: platform-team
+  type: service
+
+  parameters:
+    - title: Service Details
+      required:
+        - name
+        - repoUrl
+      properties:
+        name:
+          title: Service Name
+          type: string
+          description: The name of your new Node.js service
+        repoUrl:
+          title: Repository Location
+          type: string
+          description: GitHub repository URL where this project will be created
+          ui:autofocus: true
+          ui:field: RepoUrlPicker
+
+  steps:
+    - id: fetch
+      name: Fetch Template Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: 'A simple Node.js Hello World app'
+        repoUrl: ${{ parameters.repoUrl }}
+
+    - id: register
+      name: Register in Developer Hub Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: View Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in Developer Hub Catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
