@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: mytemprepo
+  annotations:
+    github.com/project-slug: lankapra/mytemprepo
+spec:
+  type: other
+  lifecycle: unknown
+  owner: lankapra
